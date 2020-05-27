@@ -3,8 +3,11 @@ module.exports = {
     description: "",
     args: true,
     execute(message, args) {
-        const role = message.guild.roles.cache.find(role => role.name === "Lulu");
+        const list_of_roles = message.guild.roles.cache.map(roles => roles.name);
+        const array = args.filter(role => list_of_roles.includes(role));
+
+        const roles = message.guild.roles.cache.filter((role) => array.includes(role.name));
         const member = message.mentions.members.first();
-        member.roles.add(role);
+        member.roles.add(roles);
     },
 };
