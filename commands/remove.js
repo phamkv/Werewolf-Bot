@@ -2,7 +2,7 @@ module.exports = {
     name: "remove",
     description: "Resets every permissions of the mentioned user.",
     args: true,
-    execute(message, args) {
+    execute(client, message, args) {
         const member = message.mentions.members.first();
         message.channel.permissionOverwrites.get(member.user.id).delete();
     },

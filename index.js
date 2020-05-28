@@ -8,6 +8,13 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 
 client.once("ready", () => {
     console.log("Ready!")
+    const members = client.users.cache.map(member => {
+        return {
+            id: member.id,
+            name: member.username
+        }
+    });
+    console.log(members);
 })
 
 // Consider Line 7
@@ -18,6 +25,16 @@ for (const file of commandFiles) {
     // with the key as the command name and the value as the exported module
     client.commands.set(command.name, command);
 }
+
+// The game loop
+client.on("ready", () => {
+    // setInterval(function() {
+        
+    //     client.channels.fetch('715540132866031658')
+    //         .then(channel => channel.send("Hallo!"))
+    //         .catch(channel => console.log(channel));
+    // }, 3000);
+});
 
 
 client.on("message", message => {
@@ -39,7 +56,9 @@ client.on("message", message => {
     }
 
     try {
-        command.execute(message, args);
+        //Empfängt das return value vom Befehl
+        const fb = command.execute(client, message, args);
+        console.log(fb, "Ich war hier");
     } catch (error) {
         console.error(error);
         message.reply('Oops, there was an error in executing this command!');
