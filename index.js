@@ -1,11 +1,13 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 const { prefix, token } = require('./config.json');
+const EventEmitter = require('events');
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
+// When started
 client.once("ready", () => {
     console.log("Ready!")
     const members = client.users.cache.map(member => {
@@ -17,6 +19,7 @@ client.once("ready", () => {
     console.log(members);
 })
 
+
 // Consider Line 7
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -25,16 +28,6 @@ for (const file of commandFiles) {
     // with the key as the command name and the value as the exported module
     client.commands.set(command.name, command);
 }
-
-// The game loop
-client.on("ready", () => {
-    // setInterval(function() {
-        
-    //     client.channels.fetch('715540132866031658')
-    //         .then(channel => channel.send("Hallo!"))
-    //         .catch(channel => console.log(channel));
-    // }, 3000);
-});
 
 
 client.on("message", message => {
@@ -56,13 +49,43 @@ client.on("message", message => {
     }
 
     try {
-        //Empfängt das return value vom Befehl
+        // Empfängt das return value vom Befehl
         const fb = command.execute(client, message, args);
         console.log(fb, "Ich war hier");
+        if (fb === "AAAAAAA") {
+            gameState = true;
+            
+        }
+        // Consider Line 68 
+        game.emit('event', gameState);
+        
     } catch (error) {
         console.error(error);
         message.reply('Oops, there was an error in executing this command!');
     }
 });
 
+// Game Section
+let gameState = false;
+const game = new EventEmitter();
+game.on('event', (state) => {
+    if (state) {
+        client.channels.fetch('715540132866031658')
+                    .then(channel => channel.send("Damn BOI!"))
+                    .catch(channel => console.log(channel))
+                    .then(() => gameState = false);
+    }
+    game.emit('update');
+});
+
+// The game loop
+game.on('update', () => {
+console.log("Game still in progress...");
+setTimeout(function() {
+    game.emit('update');
+}, 3000);
+});
+
+
+// Log in, just leave it
 client.login(token);
